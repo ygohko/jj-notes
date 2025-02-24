@@ -8,137 +8,132 @@
 )
 
 #set text(
-  size: 9pt,
-  font: "IBM Plex Sans"
+  size: 8.5pt,
+  font: "IBM Plex Sans JP"
 )
 #show heading.where(level: 1): set align(center)
 
-#show raw: it => text(font: "IBM Plex Mono", weight: "semibold", fill: command-color, it)
+#show raw: it => text(font: "PlemolJP", weight: "semibold", fill: command-color, it)
 #show emph: it => text(fill: emph-color, weight: "semibold", it)
 
 
-= JJ Reference
+= JJ リファレンス
 
 // This is a _reference_ for the Jujutsu version control system. It exists to help you learn and
 // remember the details of Jujutsu, once you have already grokked the basics.
 
-== Model
+== モデル
 
-A Jujutsu repository is a DAG (directed acyclic graph) whose nodes are called _changes_. Each change
-has:
+JujutsuリポジトリはDAG(有向非巡回グラフ)で、そのノードは_変更_と呼ばれます。それぞれの変更は以下の
+ものを持っています:
 
-- A state of the filesystem within the repository directory. You can imagine each change storing a
-  full copy of the directory and all the files in it, though `jj` is more efficient than this.
-- File _conflicts_. Some files in a change may contain conflicts, from a variety of different
-  sources. These conflicts are local to the change. (Unlike `git`, they do not block your use of
-  `jj`.)
-- One or more _parent_ changes. Though there is a root change which has no parents and always has
-  an empty directory.
-- A textual _description_ of the change, a.k.a. a commit message. This is always present, but
-  defaults to the empty string.
+- リポジトリディレクトリ内のファイルシステムの状態。それぞれの変更がディレクトリとすべての
+  ファイルの完全なコピーを保持していて、`jj`は単に保持するよりもっと効率がよいということを
+  想像してください。
+- ファイルの_衝突_。変更の内のファイルには様々な理由で衝突があるかもしれません。それらの衝突は
+  その変更にローカルなものです。(`git`と異なり、衝突は`jj`を使うことを妨げません。)
+- 1つかそれ以上の_親_の変更。ですが、親がなく常に空ディレクトリを持つルートの変更もあります。
+- テキストによる変更の説明で、コミットメッセージとも呼ばれます。これは常に存在しますが、
+  デフォルトは空文字列です。
 
-There is some additional information attached to the DAG:
+いくつかの付加情報がDAGに添付されています:
 
-- Exactly one of the changes is the _working change_, written `@`. The docs call this the "working
-  copy revision". (This is analogous to `git`'s `HEAD`.)
-- There may be some _bookmarks_, which are unique string labels on changes. (When interfacing with
-  `git`, these bookmarks act as branch names.)
-- The repository may also be linked to a _remote repository_ (e.g. Github). If so, when `push`ing
-  and `fetch`ing, `jj` records the _last known position_ of each remote bookmark, written
-  `BOOKMARK@REMOTE` (e.g. `feat-ui@origin`).
+- 変更のうち一つだけが_作業中の変更_で、`@`で表されています。この文書ではそれを "作業コピーの
+  リビジョン"と呼びます。(これは`git`の`HEAD`に似ています。)
+- 変更への重複しない文字列のラベル _ブックマーク_があるかもしれません。(`git`と連携する場合、
+  ブックマークはブランチ名として機能します。)
+- リポジトリは(Githubのような)_リモートリポジトリ_と関連付けされているかもしれません。その場合、
+  `push`または`fetch`時に、`jj`はそれぞれのブックマークの_最後に知っている位置_を
+  `ブックマーク@リモート`で表して記録します(例: `feat-ui@origin`)。
 
-Most `jj` commands modify your local repository DAG in some way. Some general rules will help you
-predict how it responds to modifications:
+ほとんどの`jj`のコマンドはローカルリポジトリのDAGを何らかの方法で変更します。いくつかの一般的な
+ルールが、コマンドがどのように変更に応えるかを予測する手助けになるでしょう:
 
-- When you make `@` point at a change, your repository directory is updated to match that change's
-  files.
-- If you delete the change that `@` is pointing at, `@` moves to a new empty change off of its
-  parent(s).
-- If a change has no file modifications and no description, and is not referenced by `@` or by a
-  bookmark, it disappears silently into the night.
-- A change represents a diff. Moving a change tries to apply the diff to its new parent. This
-  may cause merge conflicts.
-- Many commands act on `@` by default. Almost all of them can take a `-r/--revision` argument to act
-  on a different change.
+- `@`の位置を変更した時、リポジトリディレクトリは変更のファイルと一致するよう更新されます。
+- `@`が指している変更を削除した場合、`@`はその親から作られた新しい空の変更に移動します。 
+- 変更にファイルの修正と説明の修正がなく、`@`やブックマークから参照されていない場合、静かに闇へと
+  消えてゆきます。
+- 変更は差分を表現しています。変更を移動すると新しい親に差分を適用しようとします。これはマージ
+  コンフリクトを起こすかもしれません。
+- 多くのコマンドはデフォルトでは`@`に作用します。ほぼ全てのコマンドは他の変更に作用させるために
+  `-r/--revision`の引数を取ることができます。
   // (Of the commands in the Cheat Sheet that show `@`, all can be applied to a
   // different change using `-r` except for `jj bookmark move` and `jj restore`, which take `--from`
   // and `--to` arguments instead.)
 
-=== File Conflicts
+=== ファイルの衝突
 
-If the working change (`@`) has a _file conflict_, resolving it is as simple as editing the file so
-as to no longer have conflict markers (`<<<<<<<`, `=======`, etc.) in it. For a binary file,
-replace the file with the version you want. `jj restore` may be useful for this purpose. (Unlike
-`git`, file conflicts don't block you.)
+作業中の変更(`@`)に_ファイルの衝突_がある場合、単に衝突マーカー(`<<<<<<<`、`=======`など)が
+無くなるようにそのファイルを編集すれば解決されます。バイナリファイルの場合は、あるべきバージョンの
+ファイルに置き換えてください。この目的には`jj restore`が便利かもしれません。(`git`と異なり、
+ファイルの衝突は作業を妨げません。)
 
 === jj git push
 
-`jj git push` copies changes from the local repo into the remote repo. If a local change has been
-modified since it was last pushed, it becomes a brand new change in the remote repo (just like
-force pushing in `git` replaces old commits with new commits). To prevent you from accidentally
-doing this to `main`, `jj git push` makes all pushed changes in the primary branch immutable. You
-can still edit them if you want, but you have to pass the `--ignore-immutable` flag.
+`jj git push`は変更をローカルリポジトリからリモートリポジトリにコピーします。ローカルの変更が最後の
+プッシュ時から修正されている場合、それはリモートリポジトリの新しい変更になります (`git`の強制
+プッシュのように以前のコミットを新しいコミットで置き換えます)。
+この操作をうっかり`main`に行うことを防ぐため、`jj git push`は主要なブランチにプッシュされた変更を
+修正不能にします。これらの変更は必要ならば引き続き編集できますが、それには`--ignore-immutable`
+フラグを与える必要があります。
 
-All local bookmarks are similarly copied to the remote repo. If a bookmark is present
-both locally and remotely, `jj` checks if its (locally recorded) _last seen position_ matches its
-current position in the remote repo. If so, the bookmark's position in the remote repo is updated.
-If not, this command fails and tells you to `jj git fetch` first (because it means that someone else
-updated the bookmark since you last pushed it).
+すべてのローカルブックマークは同様にリモートリポジトリにコピーされます。ブックマークがローカルと
+リモートの両方にある場合、`jj`はその(ローカルに記録された)_最後に見ていた位置_が
+リモートリポジトリの現在の位置と一致するかを調べます。その場合、リモートリポジトリのブックマーク
+位置は更新されます。そうでなければこのコマンドは失敗し、(あなたが最後にプッシュしてから誰かが
+ブックマークを更新したということなので)まずは`jj git fetch`を行うよう知らせます。
 
 === jj git fetch
 
-`jj git fetch` copies changes from the remote repo into the local repo. If a change has been
-modified in the remote repo, it turns into a new change locally. Though most of the time you're just
-fetching fresh new changes.
+`jj git fetch`はリモートリポジトリの変更をローカルリポジトリにコピーします。変更が
+リモートリポジトリで修正された場合、それはローカルの新しい変更に変わります。ですが、ほとんどの
+場合は単に新しい変更を取得します。
 
-Local bookmarks are advanced to match the change that they're on in the remote repo. However, if the
-change a bookmark is on in the remote is not a descendant of the change it's on locally,
-`jj git fetch` creates a second copy of that bookmark.
-This is called a _bookmark conflict_ because it violates the invariant that bookmark names
-are unique. (This is analogous to `git pull` producing a merge conflict.) It is
-up to you how to resolve this "bookmark conflict". Some of the options available to you:
+ローカルのブックマークはリモートリポジトリにある変更と一致するように進みます。しかし、リモート上の
+ブックマークの変更がローカルの変更の子孫でない場合、`jj git fetch`はそのブックマークのもう1つの
+コピーを作ります。
+これはブックマーク名が単一であることの不変性を破るので、_ブックマークの衝突_と呼ばれます。
+(これは`git pull`がマージコンフリクトを生じることに似ています。)この"ブックマークの衝突"をどう
+解決するかはあなた次第です。いくつかの選択肢があります:
 
-- If you want to merge the two changes, say `jj new CHANGE-ID-1 CHANGE-ID-2`, resolve any file
-  conflicts, then update the bookmark with `jj bookmark move BOOKMARK-NAME`.
-  (You can get the change ids by running `jj bookmark list BOOKMARK-NAME`.)
-- If you want to discard one of the two changes and just use the other one, say
-  `jj bookmark move BOOKMARK-NAME -r CHANGE-ID` for the change you want to keep.
-- If you want to rebase one of the changes to come _after_ the other, say
-  `jj rebase -b CHANGE-ID-2 -d CHANGE-ID-1`, then
-  `jj bookmark move BOOKMARK-NAME -r CHANGE-ID-2`.
-  This will rebase not only the second change itself, but all changes after it forked away from the
-  first change.
+- 2つの変更をマージしたい場合、`jj new 変更ID-1 変更ID-2`を行い、衝突を解決し、その後
+  `jj bookmark move ブックマーク名`でブックマークを更新します。 (変更IDは
+  `jj bookmark list ブックマーク名`を実行すると取得できます。)
+- 2つの変更のうち1つを捨てて単にもう一方を使いたい場合、残したい変更に対し
+  `jj bookmark move ブックマーク名 -r 変更ID`を行います。
+- 一方の変更がもう一方の変更の_後_に来るようリベースしたい場合、
+  `jj rebase -b 変更ID-2 -d 変更ID-1`を行い、その後`jj bookmark move ブックマーク名 -r 変更ID-2`を
+  行います。これは2つ目の変更のみではなく、1つ目の変更から分岐したすべての変更をリベースします。
 
-== Commands
+== コマンド
 
-=== Global Setup Commands
+=== 共通設定のコマンド
 
 ```
-jj config set --user user.name  MY_NAME
-jj config set --user user.email MY_EMAIL
-jj config set --user ui.editor  MY_EDITOR
+jj config set --user user.name  私の名前
+jj config set --user user.email 私のEMAIL
+jj config set --user ui.editor  私のエディター
 
-jj config edit --user  // Manually edit config file
+jj config edit --user  // 設定ファイルを手で編集する
 ```
 
-Instead of `--user`, you can pass `--repo` to change the repository specific config, which takes
-priority.
+`--user`の代わりに`--repo`を渡すと、リポジトリ固有の優先的な設定を変更できます。
 
-=== Repository Commands
+=== リポジトリのコマンド
 
-- `jj git init`, or `jj git clone URL [DESTINATION]`. Make or clone a git-backed repo.
-- `jj git init --colocate`. Make an existing `git` repo also be a `jj` repo.
+- `jj git init`、または`jj git clone URL [送り先]`。gitバックエンドのリポジトリを作成またはクローン
+  する。
+- `jj git init --colocate`。既存の`git`リポジトリが`jj`リポジトリにもなるようにする。
 
-=== Editing your Local Repo
+=== ローカルリポジトリを編集する
 
-The attached JJ Cheat Sheet visually describes the most common/fundamental commands for editing a
-`jj` repo.
+添付のJJ チートシートでは`jj`リポジトリを編集するためのもっとも一般的で基本的なコマンドを視覚的に
+説明します。
 
-There are also a couple of "alias" commands that are best thought of as combinations of other `jj`
-commands:
+他の`jj`コマンドの組み合わせとして考えるとよい、いくつかの"エイリアス"コマンドもあります:
 
-- `jj commit`. Shorthand for `jj describe; jj new`.
-- `jj bookmark set BOOKMARK`. Either `create` or `move` the bookmark, whichever is valid.
+- `jj commit`。`jj describe; jj new`の省略。
+- `jj bookmark set ブックマーク名`。ブックマークの`create`または`move`、どちらか有効なほう。
 
 // ## Commands
 // 

@@ -3,7 +3,10 @@
 
 #set page(
   "us-letter",
-  margin: 0.5in,
+  margin: (
+    x: 0.5in,
+    y: 0.40in,
+  ),
   flipped: false,
 )
 
@@ -40,14 +43,14 @@
 
 // Two primary fonts
 #let font-mono(some-text) = text(
-  font: "IBM Plex Mono",
+  font: "PlemolJP",
   size: 9.5pt,
   weight: "bold",
   fill: text-color,
   some-text
 )
 #let font-sans(some-text) = text(
-  font: "IBM Plex Sans",
+  font: "IBM Plex Sans JP",
   size: 9.5pt,
   weight: "regular",
   fill: text-color,
@@ -245,12 +248,12 @@
 
 #let jj-status = freeform-command(
   [jj status],
-  [Shows current and \ parent change, \ and file modifications.],
+  [現在の変更と \ 親の変更、ファイルの \ 修正を表示する。],
 )
 
 #let jj-plain = freeform-command(
   [jj],
-  [Shows important changes \ in the repo.],
+  [リポジトリ内の重要な \ 変更を表示する。],
 )
 
 #let jj-log = freeform-command(
@@ -298,7 +301,7 @@
     change("r", (0, 0), highlighted-bookmark: "feat/ui")
     change("q", (0, 4.8), highlighted-bookmark: "feat/api")
   },
-  [#text-highlight[] Prints all bookmarks.]
+  [#text-highlight[] すべてのブックマークを表示する。]
 )
 
 // ~~~~~~~~~~~~
@@ -308,7 +311,7 @@
 #let jj-show = read-command(
   [jj show],
   change("r", (0, 0), working: true, highlighted-description: "edit foo"),
-  [#text-highlight[] Prints this change's description.]
+  [#text-highlight[] この変更の説明を表示する。]
 )
 
 #let jj-describe = write-command(
@@ -393,7 +396,7 @@
     change("q", (1, 0), highlighted-files: 1)
     edge("r", "q")
   },
-  [#text-highlight[] Prints the diff between \ #text-files(1) and #text-files(2).]
+  [#text-highlight[] #text-files(1)と#text-files(2)の \ 間の差分を表示する。]
 )
 
 #let jj-restore = write-command(
@@ -446,7 +449,7 @@
 
 #let jj-undo = freeform-command(
   [jj undo],
-  [Undoes the last command.#h(-0.35em)],
+  [最後のコマンドを \ アンドゥする。#h(-0.35em)],
 )
 
 // ~~~~~~
@@ -468,19 +471,19 @@
   )
 }
 #let legend = make-legend((
-  (canvas(node("r", (0, 0))), [a _change_]),
-  (working-glyph, [the _working change_ ("working copy revision")]),
-  (text-description("edit foo"), [a change's _description_]),
-  (text-bookmark("feat/ui"), [a _bookmark_]),
-  (text-files(1), [a state of the filesystem]),
-  (text-edit(1), [a diff between two changes]),
+  (canvas(node("r", (0, 0))), [_変更_]),
+  (working-glyph, [_作業中の変更_("作業コピーのリビジョン")]),
+  (text-description("edit foo"), [変更の_説明_]),
+  (text-bookmark("feat/ui"), [_ブックマーク_]),
+  (text-files(1), [ファイルシステムの状態]),
+  (text-edit(1), [二つの変更の間の差分]),
 ))
 
 // ~~~~~~~~~~~
 // Cheat Sheet
 // ~~~~~~~~~~~
 
-#align(center)[#text(font: "IBM Plex Sans")[= JJ Cheat Sheet]]
+#align(center)[#text(font: "IBM Plex Sans JP")[= JJ チートシート]]
 #v(1em)
 
 #let row(..args) = {
@@ -527,4 +530,4 @@
   legend,
 )
 
-#place(bottom + right, text-attribution[justinpombrio.net \ & lark.gay \ Feb 2025])
+#place(bottom + right, text-attribution[justinpombrio.net \ & lark.gay \ Feb 2025 \ 日本語訳: https://github.com/ygohko/jj-notes])
