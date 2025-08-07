@@ -102,10 +102,10 @@ up to you how to resolve this "bookmark conflict". Some of the options available
   conflicts, then update the bookmark with `jj bookmark move BOOKMARK-NAME`.
   (You can get the change ids by running `jj bookmark list BOOKMARK-NAME`.)
 - If you want to discard one of the two changes and just use the other one, say
-  `jj bookmark move BOOKMARK-NAME -r CHANGE-ID` for the change you want to keep.
+  `jj bookmark move BOOKMARK-NAME -t CHANGE-ID` for the change you want to keep.
 - If you want to rebase one of the changes to come _after_ the other, say
   `jj rebase -b CHANGE-ID-2 -d CHANGE-ID-1`, then
-  `jj bookmark move BOOKMARK-NAME -r CHANGE-ID-2`.
+  `jj bookmark move BOOKMARK-NAME -t CHANGE-ID-2`.
   This will rebase not only the second change itself, but all changes after it forked away from the
   first change.
 
