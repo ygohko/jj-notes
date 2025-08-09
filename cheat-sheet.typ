@@ -248,12 +248,12 @@
 
 #let jj-status = freeform-command(
   [jj status],
-  [現在の変更と \ 親の変更、ファイルの \ 修正を表示する。],
+  [現在のチェンジと親の \ チェンジ、ファイルの \ 修正を表示する。],
 )
 
 #let jj-plain = freeform-command(
   [jj],
-  [リポジトリ内の重要な \ 変更を表示する。],
+  [リポジトリ内の重要な \ チェンジを表示する。],
 )
 
 #let jj-log = freeform-command(
@@ -310,14 +310,14 @@
 
 #let jj-show = read-command(
   [jj show],
-  change("r", (0, 0), working: true, highlighted-description: "edit foo"),
-  [#text-highlight[] この変更の説明を表示する。]
+  change("r", (0, 0), working: true, highlighted-description: "fooを編集"),
+  [#text-highlight[] このチェンジの説明を表示する。]
 )
 
 #let jj-describe = write-command(
-  change("r", (0, 0), working: true, description: "edti foo"),
-  [jj describe -m #text-description("edit foo")],
-  change("r", (0, 0), working: true, description: "edit foo")
+  change("r", (0, 0), working: true, description: "fooを変数y"),
+  [jj describe -m #text-description("fooを編集")],
+  change("r", (0, 0), working: true, description: "fooを編集")
 )
 
 // ~~~~~
@@ -339,12 +339,12 @@
 #let jj-new = write-command(
   {
     blank((0, 0))
-    change("q", (1, 0), working: true, bookmark: "feat/ui", description: "edit foo")
+    change("q", (1, 0), working: true, bookmark: "feat/ui", description: "fooを編集")
   },
   [jj new],
   {
     change("r", (0, 0), working: true)
-    change("q", (1, 0), bookmark: "feat/ui", description: "edit foo")
+    change("q", (1, 0), bookmark: "feat/ui", description: "fooを編集")
     edge("r", "q")
   }
 )
@@ -471,12 +471,12 @@
   )
 }
 #let legend = make-legend((
-  (canvas(node("r", (0, 0))), [_変更_]),
-  (working-glyph, [_作業中の変更_("作業コピーのリビジョン")]),
-  (text-description("edit foo"), [変更の_説明_]),
+  (canvas(node("r", (0, 0))), [_チェンジ_]),
+  (working-glyph, [_作業中のチェンジ_("作業コピーのリビジョン")]),
+  (text-description("fooを編集"), [チェンジの_説明_]),
   (text-bookmark("feat/ui"), [_ブックマーク_]),
   (text-files(1), [ファイルシステムの状態]),
-  (text-edit(1), [二つの変更の間の差分]),
+  (text-edit(1), [二つのチェンジの間の差分]),
 ))
 
 // ~~~~~~~~~~~
